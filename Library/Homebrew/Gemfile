@@ -38,7 +38,7 @@ group :sorbet, optional: true do
 end
 
 # vendored gems
-gem "activesupport"
+gem "activesupport", ">= 6.1.7.3"
 gem "addressable"
 gem "concurrent-ruby"
 gem "mechanize"
