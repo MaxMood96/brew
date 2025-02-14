@@ -1,9 +1,8 @@
-# typed: false
 # frozen_string_literal: true
 
 require "compilers"
 
-describe CompilerFailure do
+RSpec.describe CompilerFailure do
   alias_matcher :fail_with, :be_fails_with
 
   describe "::create" do
@@ -22,9 +21,9 @@ describe CompilerFailure do
     end
 
     it "can be given an empty block" do
-      failure = described_class.create(:clang) {
+      failure = described_class.create(:clang) do
         # do nothing
-      }
+      end
       expect(failure).to fail_with(
         instance_double(CompilerSelector::Compiler, "Compiler", type: :clang, name: :clang, version: 600),
       )

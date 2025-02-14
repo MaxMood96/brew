@@ -1,51 +1,81 @@
 inherit_from:
   - ../.rubocop.yml
 
+Bundler/GemFilename:
+  Enabled: false
+
 Homebrew/MoveToExtendOS:
   Enabled: true
   Exclude:
     - "{extend,test,requirements}/**/*"
     - "os.rb"
 
-# make rspec formatting more flexible
-Layout/MultilineMethodCallIndentation:
-  Exclude:
-    - "**/*_spec.rb"
-
 Naming/PredicateName:
+  inherit_mode:
+    merge:
+      - AllowedMethods
   AllowedMethods:
     - is_32_bit?
     - is_64_bit?
 
+# Only enforce documentation for public APIs.
+# Checked by the tests.yml syntax job
 Style/Documentation:
   AllowedConstants:
     - Homebrew
+  Include:
+    - abstract_command.rb
+    - cask/cask.rb
+    - cask/dsl.rb
+    - cask/dsl/version.rb
+    - cask/url.rb
+    - development_tools.rb
+    - download_strategy.rb
+    - extend/ENV/super.rb
+    - extend/kernel.rb
+    - extend/pathname.rb
+    - formula.rb
+    - formula_assertions.rb
+    - formula_free_port.rb
+    - language/go.rb
+    - language/java.rb
+    - language/node.rb
+    - language/perl.rb
+    - language/python.rb
+    - livecheck/strategy/apache.rb
+    - livecheck/strategy/bitbucket.rb
+    - livecheck/strategy/cpan.rb
+    - livecheck/strategy/crate.rb
+    - livecheck/strategy/extract_plist.rb
+    - livecheck/strategy/git.rb
+    - livecheck/strategy/github_latest.rb
+    - livecheck/strategy/github_releases.rb
+    - livecheck/strategy/gnome.rb
+    - livecheck/strategy/gnu.rb
+    - livecheck/strategy/hackage.rb
+    - livecheck/strategy/json.rb
+    - livecheck/strategy/launchpad.rb
+    - livecheck/strategy/npm.rb
+    - livecheck/strategy/page_match.rb
+    - livecheck/strategy/pypi.rb
+    - livecheck/strategy/sourceforge.rb
+    - livecheck/strategy/sparkle.rb
+    - livecheck/strategy/xml.rb
+    - livecheck/strategy/xorg.rb
+    - livecheck/strategy/yaml.rb
+    - os.rb
+    - resource.rb
+    - utils/inreplace.rb
+    - utils/shebang.rb
+    - utils/string_inreplace_extension.rb
+    - version.rb
+    - tap.rb
+
+Homebrew/NegateInclude:
   Exclude:
-    - "extend/**/*.rb"
-    - "test/**/*.rb"
-    - "cask/macos.rb"
-    - "cli/args.rb"
-    - "cli/parser.rb"
-    - "cmd/list.rb"
-    - "cmd/update-report.rb"
-    - "dev-cmd/irb.rb"
-    - "dev-cmd/pr-pull.rb"
-    - "keg_relocate.rb"
-    - "os/mac/keg.rb"
-    - "software_spec.rb"
-    - "utils.rb"
-    - "utils/fork.rb"
-    - "utils/git_repository.rb"
-    - "utils/popen.rb"
-    - "utils/shell.rb"
+    # YARD runs stand-alone.
+    - yard/docstring_parser.rb
 
-Style/HashAsLastArrayItem:
-  Exclude:
-    - "test/utils/spdx_spec.rb"
-
-Style/BlockDelimiters:
-  BracesRequiredMethods:
-    - "sig"
-
-Bundler/GemFilename:
-  Enabled: false
+Style/DocumentationMethod:
+  Include:
+    - "formula.rb"

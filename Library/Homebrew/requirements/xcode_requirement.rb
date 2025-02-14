@@ -1,14 +1,10 @@
-# typed: true
+# typed: true # rubocop:todo Sorbet/StrictSigil
 # frozen_string_literal: true
 
 require "requirement"
 
 # A requirement on Xcode.
-#
-# @api private
 class XcodeRequirement < Requirement
-  extend T::Sig
-
   fatal true
 
   attr_reader :version
@@ -20,7 +16,7 @@ class XcodeRequirement < Requirement
 
   def initialize(tags = [])
     @version = tags.shift if tags.first.to_s.match?(/(\d\.)+\d/)
-    super(tags)
+    super
   end
 
   sig { returns(T::Boolean) }
@@ -58,9 +54,9 @@ class XcodeRequirement < Requirement
   end
 
   def display_s
-    return name.capitalize unless @version
+    return "#{name.capitalize} (on macOS)" unless @version
 
-    "#{name.capitalize} >= #{@version}"
+    "#{name.capitalize} >= #{@version} (on macOS)"
   end
 end
 
