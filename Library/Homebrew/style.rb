@@ -88,6 +88,7 @@ module Homebrew
       shfmt_result = files.present? && shell_files.empty?
       shfmt_result ||= run_shfmt(shell_files, fix:)
 
+      actionlint_files = github_workflow_files if files.blank? && actionlint_files.blank?
       has_actionlint_workflow = actionlint_files.any? do |path|
         path.to_s.end_with?("/.github/workflows/actionlint.yml")
       end
@@ -298,7 +299,7 @@ module Homebrew
 
     def self.shell_scripts
       [
-        HOMEBREW_ORIGINAL_BREW_FILE,
+        HOMEBREW_ORIGINAL_BREW_FILE.realpath,
         HOMEBREW_REPOSITORY/"completions/bash/brew",
         HOMEBREW_REPOSITORY/"Dockerfile",
         *HOMEBREW_REPOSITORY.glob(".devcontainer/**/*.sh"),
