@@ -170,8 +170,14 @@ module Homebrew
                                                                               last_word_connector: " or ")}."
       end
 
-      return unless @strict
       return unless @core_tap
+
+      if CoreCaskTap.instance.cask_tokens.include?(name)
+        problem "Formula name conflicts with an existing Homebrew/cask cask's token."
+        return
+      end
+
+      return unless @strict
 
       problem "'#{name}' is not allowed in homebrew/core." if MissingFormula.disallowed_reason(name)
 
@@ -182,6 +188,11 @@ module Homebrew
 
       if (oldname = CoreTap.instance.formula_renames[name])
         problem "'#{name}' is reserved as the old name of #{oldname} in homebrew/core."
+        return
+      end
+
+      if CoreCaskTap.instance.cask_tokens.include?(name)
+        problem "Formula name conflicts with an existing Homebrew/cask cask's token."
         return
       end
 
@@ -203,7 +214,7 @@ module Homebrew
     INCOMPATIBLE_LICENSES = [
       "Aladdin",    # https://www.gnu.org/licenses/license-list.html#Aladdin
       "CPOL-1.02",  # https://www.gnu.org/licenses/license-list.html#cpol
-      "gSOAP-1.3b", # https://salsa.debian.org/ellert/gsoap/-/blob/master/debian/copyright
+      "gSOAP-1.3b", # https://salsa.debian.org/ellert/gsoap/-/blob/HEAD/debian/copyright
       "JSON",       # https://wiki.debian.org/DFSGLicenses#JSON_evil_license
       "MS-LPL",     # https://github.com/spdx/license-list-XML/issues/1432#issuecomment-1077680709
       "OPL-1.0",    # https://wiki.debian.org/DFSGLicenses#Open_Publication_License_.28OPL.29_v1.0
@@ -396,7 +407,7 @@ module Homebrew
           base_info = event_payload.dig("pull_request", "base").to_h # handle `nil`
 
           # We need to read the head ref from `GITHUB_EVENT_PATH` because
-          # `git branch --show-current` returns `master` on PR branches.
+          # `git branch --show-current` returns the default branch on PR branches.
           staging_branch = base_info["ref"]&.end_with?("-staging")
           homebrew_owned_repo = base_info.dig("repo", "owner", "login") == "Homebrew"
           homebrew_core_pr = base_info.dig("repo", "name") == "homebrew-core"
@@ -968,6 +979,15 @@ module Homebrew
     def audit_deprecate_disable
       error = SharedAudits.check_deprecate_disable_reason(formula)
       problem error if error
+    end
+
+    def audit_no_autobump
+      return if formula.autobump?
+
+      return unless @new_formula_inclusive
+
+      error = SharedAudits.no_autobump_new_package_message(formula.no_autobump_message)
+      new_formula_problem error if error
     end
 
     def quote_dep(dep)
