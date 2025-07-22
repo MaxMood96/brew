@@ -65,8 +65,8 @@ end
 group :typecheck, optional: true do
   gem "method_source", require: false
   gem "sorbet-static-and-runtime", require: false
-  gem "spoom", require: false
-  gem "tapioca", require: false
+  gem "spoom", ">= 1.7.0", require: false
+  gem "tapioca", ">= 0.17.0", require: false
 end
 group :vscode, optional: true do
   gem "ruby-lsp", require: false
