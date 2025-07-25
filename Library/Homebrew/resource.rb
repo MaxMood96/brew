@@ -4,7 +4,7 @@
 require "downloadable"
 require "mktemp"
 require "livecheck"
-require "extend/on_system"
+require "on_system"
 
 # Resource is the fundamental representation of an external resource. The
 # primary formula download, along with other declared resources, are instances
@@ -235,6 +235,9 @@ class Resource
     @url&.specs || {}.freeze
   end
 
+  sig { override.returns(String) }
+  def download_type = "Resource"
+
   protected
 
   def stage_resource(prefix, debug_symbols: false, &block)
@@ -339,6 +342,9 @@ class Resource
       manifest_annotations["sh.brew.bottle.installed_size"]&.to_i
     end
 
+    sig { override.returns(String) }
+    def download_type = "Bottle Manifest"
+
     private
 
     def manifest_annotations
@@ -391,6 +397,9 @@ class Resource
 
       @directory = val
     end
+
+    sig { override.returns(String) }
+    def download_type = "Patch"
   end
 end
 

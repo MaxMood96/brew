@@ -12,7 +12,7 @@ require "utils/bottles"
 require "patch"
 require "compilers"
 require "macos_version"
-require "extend/on_system"
+require "on_system"
 
 class SoftwareSpec
   include Downloadable
@@ -82,9 +82,7 @@ class SoftwareSpec
   end
 
   sig { override.returns(String) }
-  def download_type
-    "formula"
-  end
+  def download_type = "Formula"
 
   def owner=(owner)
     @name = owner.name

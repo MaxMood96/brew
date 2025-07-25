@@ -91,7 +91,7 @@ class Bottle
   def fetch(verify_download_integrity: true, timeout: nil, quiet: false)
     resource.fetch(verify_download_integrity:, timeout:, quiet:)
   rescue DownloadError
-    raise unless fallback_on_error
+    raise unless fallback_on_error?
 
     fetch_tab
     retry
@@ -121,7 +121,7 @@ class Bottle
     begin
       resource.fetch(timeout:, quiet:)
     rescue DownloadError
-      raise unless fallback_on_error
+      raise unless fallback_on_error?
 
       retry
     rescue Resource::BottleManifest::Error
@@ -185,6 +185,9 @@ class Bottle
     end
   end
 
+  sig { override.returns(String) }
+  def download_type = "Bottle"
+
   private
 
   def select_download_strategy(specs)
@@ -193,7 +196,7 @@ class Bottle
     specs
   end
 
-  def fallback_on_error
+  def fallback_on_error?
     # Use the default bottle domain as a fallback mirror
     if @resource.url.start_with?(Homebrew::EnvConfig.bottle_domain) &&
        Homebrew::EnvConfig.bottle_domain != HOMEBREW_BOTTLE_DEFAULT_DOMAIN

@@ -1261,7 +1261,7 @@ RSpec.describe Homebrew::FormulaAuditor do
       allow(File).to receive(:open).and_return("")
     end
 
-    specify "it warns when conflicting with non-existing formula" do
+    specify "it warns when conflicting with non-existing formula", :no_api do
       foo = formula("foo") do
         url "https://brew.sh/bar-1.0.tgz"
 
@@ -1275,7 +1275,7 @@ RSpec.describe Homebrew::FormulaAuditor do
         .to match("Can't find conflicting formula \"bar\"")
     end
 
-    specify "it warns when conflicting with itself" do
+    specify "it warns when conflicting with itself", :no_api do
       foo = formula("foo") do
         url "https://brew.sh/bar-1.0.tgz"
 
@@ -1290,7 +1290,7 @@ RSpec.describe Homebrew::FormulaAuditor do
         .to match("Formula should not conflict with itself")
     end
 
-    specify "it warns when another formula does not have a symmetric conflict" do
+    specify "it warns when another formula does not have a symmetric conflict", :no_api do
       stub_formula_loader formula("gcc") { url "gcc-1.0" }
       stub_formula_loader formula("glibc") { url "glibc-1.0" }
 
@@ -1341,6 +1341,36 @@ RSpec.describe Homebrew::FormulaAuditor do
       mkdir_p fa.formula.prefix
       fa.audit_deprecate_disable
       expect(fa.problems).to be_empty
+    end
+  end
+
+  describe "#audit_no_autobump" do
+    it "warns when autobump exclusion reason is not suitable for new formula" do
+      fa = formula_auditor "foo", <<~RUBY, new_formula: true
+        class Foo < Formula
+          url "https://brew.sh/foo-1.0.tgz"
+
+          no_autobump! because: :requires_manual_review
+        end
+      RUBY
+
+      fa.audit_no_autobump
+      expect(fa.new_formula_problems.first[:message])
+        .to match("`:requires_manual_review` is a temporary reason intended for existing packages, " \
+                  "use a different reason instead.")
+    end
+
+    it "does not warn when autobump exclusion reason is allowed" do
+      fa = formula_auditor "foo", <<~RUBY, new_formula: true
+        class Foo < Formula
+          url "https://brew.sh/foo-1.0.tgz"
+
+          no_autobump! because: "foo bar"
+        end
+      RUBY
+
+      fa.audit_no_autobump
+      expect(fa.new_formula_problems).to be_empty
     end
   end
 end

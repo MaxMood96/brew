@@ -45,7 +45,7 @@ module Homebrew
           Cask::Cask.generating_hash!
 
           all_casks = {}
-          latest_macos = MacOSVersion.new((HOMEBREW_MACOS_NEWEST_UNSUPPORTED.to_i - 1).to_s).to_sym
+          latest_macos = MacOSVersion.new(HOMEBREW_MACOS_NEWEST_SUPPORTED).to_sym
           Homebrew::SimulateSystem.with(os: latest_macos, arch: :arm) do
             tap.cask_files.each do |path|
               cask = Cask::CaskLoader.load(path)
@@ -71,13 +71,11 @@ module Homebrew
           File.write("_data/cask_canonical.json", "#{canonical_json}\n") unless args.dry_run?
 
           OnSystem::VALID_OS_ARCH_TAGS.each do |bottle_tag|
-            variation_casks = all_casks.transform_values do |cask|
+            variation_casks = all_casks.map do |_, cask|
               Homebrew::API.merge_variations(cask, bottle_tag:)
             end
 
-            unless args.dry_run?
-              File.write("api/internal/cask.#{bottle_tag}.json", JSON.pretty_generate(variation_casks))
-            end
+            File.write("api/internal/cask.#{bottle_tag}.json", JSON.generate(variation_casks)) unless args.dry_run?
           end
         end
       end
